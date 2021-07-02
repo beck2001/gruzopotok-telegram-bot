@@ -10,6 +10,8 @@ async def on_startup(dispatcher: Dispatcher):
     # set default bot commands
     await set_default_commands(dispatcher)
 
+    # need to add connection to database, possible to do in middlewares
+
     # notify admins about bot start
     await on_startup_notify(dispatcher)
 
