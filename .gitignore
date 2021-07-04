@@ -5,3 +5,10 @@ venv/
 # pycharm
 .idea/
 __pycache__/
+
+# setting of a server
+bot.conf
+ubuntu@18.117.142.248
+
+
+
