@@ -1,3 +1,5 @@
+from typing import Union
+
 from asyncpg import UniqueViolationError
 
 from utils.db_api.db_gino import db
@@ -7,9 +9,9 @@ from utils.db_api.schemas.search_model import SearchModel
 
 
 # user commands
-async def add_user(id: int, name: str, phone_number: str = None, email: str = None, city: str = None):
+async def add_user(id: int, name: str, phone_number: str = None, email: str = None):
     try:
-        user = User(id=id, name=name, phone_number=phone_number, email=email, city=city)
+        user = User(id=id, name=name, phone_number=phone_number, email=email)
         await user.create()
     except UniqueViolationError as err:
         pass
@@ -32,17 +34,14 @@ async def count_users():
 
 async def update_user_phone_number(id: int, phone_number: str):
     user = await User.get(id)
-    await user.update(phone_number=phone_number).apply()
+    if user:
+        await user.update(phone_number=phone_number).apply()
 
 
 async def update_user_email(id: int, email: str):
     user = await User.get(id)
-    await user.update(email=email).apply()
-
-
-async def update_user_city(id: int, city: str):
-    user = await User.get(id)
-    await user.update(city=city).apply()
+    if user:
+        await user.update(email=email).apply()
 
 
 # cargo commands

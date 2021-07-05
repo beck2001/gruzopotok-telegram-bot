@@ -8,5 +8,4 @@ class User(TimeBasedModel):
     name = Column(String(100))
     phone_number = Column(String(20))
     email = Column(String(100))
-    city = Column(String(100))
     query: sql.Select

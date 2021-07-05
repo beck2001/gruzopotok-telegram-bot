@@ -12,7 +12,7 @@ async def on_startup(dispatcher: Dispatcher):
     # create users table in db
     logging.info(f"Connecting to database")
     await db_gino.on_startup(dp)
-    logging.info(f"Creating users table")
+    logging.info(f"Creating all tables")
     await db.gino.create_all()
 
     # set default bot commands

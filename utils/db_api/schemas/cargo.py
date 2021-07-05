@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, String, sql
+from sqlalchemy import Column, Integer, BigInteger, String, Float, sql
 from utils.db_api.db_gino import TimeBasedModel
 
 
@@ -17,6 +17,7 @@ class Cargo(TimeBasedModel):
     client_name = Column(String(100))
     client_phone_number = Column(String(20))
     client_email = Column(String(100))
+    payment = Column(Float)
     telegram_id = Column(BigInteger)
     query: sql.Select
 
