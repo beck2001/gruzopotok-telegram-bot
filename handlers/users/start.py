@@ -11,7 +11,6 @@ from utils.misc import rate_limit
 @rate_limit(limit=5, key="start_command")
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    await sql_commands.add_user(id=message.from_user.id, name=message.from_user.full_name)
     await message.answer(
         f"Этот бот умеет выполнять следующие <strong>команды:</strong>\n\n"
         "/start - начать работу с ботом\n"

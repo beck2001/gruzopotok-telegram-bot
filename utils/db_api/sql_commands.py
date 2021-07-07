@@ -3,6 +3,7 @@ from typing import Union
 from asyncpg import UniqueViolationError
 
 from utils.db_api.db_gino import db
+from utils.db_api.schemas.banned_user import BannedUser
 from utils.db_api.schemas.user import User
 from utils.db_api.schemas.cargo import Cargo
 from utils.db_api.schemas.search_model import SearchModel
@@ -44,6 +45,19 @@ async def update_user_email(id: int, email: str):
         await user.update(email=email).apply()
 
 
+async def add_banned_user(id: int, name: str = None, phone_number: str = None, email: str = None):
+    try:
+        banned_user = BannedUser(id=id, name=name, phone_number=phone_number, email=email)
+        await banned_user.create()
+    except UniqueViolationError as err:
+        pass
+
+
+async def select_all_banned_users():
+    banned_users = await BannedUser.query.gino.all()
+    return banned_users
+
+
 # cargo commands
 async def add_cargo(source: str, destination: str, time_period: str, distance: int, car_type: str, weight_from: int,
                     weight_to: int, volume_from: int, volume_to: int, client_name: str, client_phone_number: str,
@@ -55,13 +69,13 @@ async def add_cargo(source: str, destination: str, time_period: str, distance: i
     await cargo.create()
 
 
-async def select_all_cargos():
-    cargos = Cargo.query.gino.all()
+async def select_all_cargos(telegram_id: int):
+    cargos = Cargo.query.where(Cargo.telegram_id == telegram_id).gino.all()
     return cargos
 
 
-async def select_cargo(id: int):
-    cargo = await Cargo.query.where(Cargo.id == id).gino.first()
+async def select_cargo(id: int, telegram_id: int):
+    cargo = await Cargo.query.where(Cargo.id == id and Cargo.telegram_id == telegram_id).gino.first()
     return cargo
 
 
@@ -81,14 +95,18 @@ async def add_search_model(source: str, destination: str, time_period: str, dist
     await search_model.create()
 
 
-async def select_all_search_models():
-    search_models = await SearchModel.query.gino.all()
+async def select_all_search_models(telegram_id: int):
+    search_models = await SearchModel.query.where(SearchModel.telegram_id == telegram_id).gino.all()
     return search_models
 
 
-async def select_search_model(id: int):
-    search_model = await SearchModel.query.where(SearchModel.id == id).gino.first()
+async def select_search_model(id: int, telegram_id: int):
+    search_model = await SearchModel.query.where(SearchModel.id == id and SearchModel.telegram_id == telegram_id).gino.first()
     return search_model
+
+
+async def delete_search_model(id: int, telegram_id: int):
+    await SearchModel.delete.where(SearchModel.id == id and SearchModel.telegram_id == telegram_id).gino.status()
 
 
 async def count_search_models():

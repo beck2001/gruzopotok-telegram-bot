@@ -14,5 +14,5 @@ class SearchModel(TimeBasedModel):
     volume_from = Column(Integer)
     volume_to = Column(Integer)
     telegram_id = Column(BigInteger)
-    query: sql.Select
+    query: sql.Delete
 
