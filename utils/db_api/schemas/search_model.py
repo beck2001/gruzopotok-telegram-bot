@@ -7,7 +7,6 @@ class SearchModel(TimeBasedModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     source = Column(String(100))
     destination = Column(String(100))
-    time_period = Column(String(50))
     car_type = Column(String(100))
     weight_from = Column(Integer)
     weight_to = Column(Integer)

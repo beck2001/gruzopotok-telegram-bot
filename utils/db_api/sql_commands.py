@@ -59,12 +59,12 @@ async def select_all_banned_users():
 
 
 # cargo commands
-async def add_cargo(source: str, destination: str, time_period: str, distance: int, car_type: str, weight_from: int,
-                    weight_to: int, volume_from: int, volume_to: int, client_name: str, client_phone_number: str,
-                    client_email: str, telegram_id: int):
+async def add_cargo(source: str, destination: str, time_period: str, distance: int, car_type: str, weight: int,
+                    volume: int, client_name: str, client_phone_number: str,
+                    client_email: str, payment: int, telegram_id: int):
     cargo = Cargo(source=source, destination=destination, time_period=time_period, distance=distance, car_type=car_type,
-                  weight_from=weight_from, weight_to=weight_to, volume_from=volume_from, volume_to=volume_to,
-                  client_name=client_name, client_phone_number=client_phone_number, client_email=client_email,
+                  weight=weight, volume=volume,
+                  client_name=client_name, client_phone_number=client_phone_number, client_email=client_email, payment=payment,
                   telegram_id=telegram_id)
     await cargo.create()
 
@@ -85,13 +85,13 @@ async def count_cargos():
 
 
 # search model commands
-async def add_search_model(source: str, destination: str, time_period: str, distance: int, car_type: str,
-                           weight_from: int,
+async def add_search_model(source: str, destination: str, car_type: str,
+                           weight_from: int, telegram_id: int,
                            weight_to: int, volume_from: int, volume_to: int):
-    search_model = SearchModel(source=source, destination=destination, time_period=time_period, distance=distance,
+    search_model = SearchModel(source=source, destination=destination,
                                car_type=car_type,
                                weight_from=weight_from, weight_to=weight_to, volume_from=volume_from,
-                               volume_to=volume_to)
+                               volume_to=volume_to, telegram_id=telegram_id)
     await search_model.create()
 
 

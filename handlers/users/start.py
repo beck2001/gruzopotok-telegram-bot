@@ -11,6 +11,7 @@ from utils.misc import rate_limit
 @rate_limit(limit=5, key="start_command")
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
+    logging.info(f"Start command processing")
     await message.answer(
         f"Этот бот умеет выполнять следующие <strong>команды:</strong>\n\n"
         "/start - начать работу с ботом\n"

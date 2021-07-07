@@ -13,6 +13,8 @@ async def on_startup(dispatcher: Dispatcher):
     logging.info(f"Connecting to database")
     await db_gino.on_startup(dp)
     logging.info(f"Creating all tables")
+    # drop all tables to recreate them
+    # await db.gino.drop_all()
     await db.gino.create_all()
 
     # set default bot commands

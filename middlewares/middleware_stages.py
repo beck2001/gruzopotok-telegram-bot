@@ -57,7 +57,7 @@ class MiddlewareStages(BaseMiddleware):
         logging.info("----- update is processed -----------------")
 
     # for callback_query
-    async def on_pre_process_callback_query(self, callback_query: types.CallbackQuery, data: dict):
-        await callback_query.answer()
+    # async def on_pre_process_callback_query(self, callback_query: types.CallbackQuery, data: dict):
+    #     await callback_query.answer()
 
 

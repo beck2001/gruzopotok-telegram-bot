@@ -17,12 +17,14 @@ from utils.db_api.schemas.search_model import SearchModel
 async def bot_list(message: types.Message):
     logging.info("List command started working")
     search_models: List[SearchModel] = await sql_commands.select_all_search_models(message.from_user.id)
+    if len(search_models) == 0:
+        await message.answer(f"Вы не сохраняли никаких параметров поиска")
+        return
     for search_model in search_models:
         await message.answer(
             f"Параметр поиска со следующими характеристиками:\n"
             f"Точка отправления: {search_model.source}\n"
             f"Пункт назначения: {search_model.destination}\n"
-            f"Период доставки: {search_model.time_period}\n"
             f"Тип транспорта: {search_model.car_type}\n"
             f"Объем от {search_model.volume_from} до {search_model.volume_to}\n"
             f"Масса груза от {search_model.weight_from} до {search_model.weight_to}\n",
@@ -31,7 +33,7 @@ async def bot_list(message: types.Message):
                     [
                         InlineKeyboardButton(
                             text=f"❌ Удалить этот параметр",
-                            callback_data=remove_callback.new(model_type="search model", id=search_model.id)
+                            callback_data=remove_callback.new(model_type_to_remove="search model", id=search_model.id)
                         )
                     ]
                 ]
@@ -40,11 +42,13 @@ async def bot_list(message: types.Message):
     logging.info("Iteration on search models was successful")
 
 
-@dp.callback_query_handler(remove_callback.filter(model_type="search model"))
+@dp.callback_query_handler(remove_callback.filter(model_type_to_remove="search model"))
 async def remove_search_model(callback_query: types.CallbackQuery, callback_data: dict):
     logging.info(f"Removing search model from database {callback_data}")
     await sql_commands.delete_search_model(telegram_id=callback_query.from_user.id, id=int(callback_data["id"]))
-    await callback_query.message.answer(
-        text=f"Параметр удален"
+    await callback_query.answer(
+        text=f"Параметр удален",
+        show_alert=True,
+        cache_time=60
     )
     logging.info(f"Search model is removed from database")

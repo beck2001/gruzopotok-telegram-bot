@@ -25,7 +25,7 @@ async def enter_email(message: types.Message, state: FSMContext):
                   f"имя={user.name}\n"
                   f"телефон={user.phone_number}\n"
                   f"email={user.email}\n"
-            )
+                  )
         )
     await state.finish()
 
@@ -48,7 +48,6 @@ async def enter_phone(message: types.Message, state: FSMContext):
                   f"имя={user.name}\n"
                   f"телефон={user.phone_number}\n"
                   f"email={user.email}\n"
-            )
+                  )
         )
     await state.finish()
-
