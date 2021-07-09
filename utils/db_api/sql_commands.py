@@ -70,7 +70,7 @@ async def add_cargo(source: str, destination: str, time_period: str, distance: i
 
 
 async def select_all_cargos(telegram_id: int):
-    cargos = Cargo.query.where(Cargo.telegram_id == telegram_id).gino.all()
+    cargos = await Cargo.query.where(Cargo.telegram_id == telegram_id).gino.all()
     return cargos
 
 

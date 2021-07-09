@@ -5,4 +5,5 @@ from . import list
 from . import support
 from . import update_user
 from . import admin_commands
-from . import echo
+from . import inline
+# from . import echo
