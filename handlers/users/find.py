@@ -5,10 +5,14 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from keyboards.default import car_type_menu
 from keyboards.inline.callback_datas import save_callback
 from loader import dp
 from states import Cargo
 from utils.db_api import sql_commands
+
+# dictionary to store search parameters
+SEARCH_PARAMETERS = {}
 
 
 @dp.message_handler(Command("find"))
@@ -39,7 +43,7 @@ async def find_destination(message: types.Message, state: FSMContext):
             "destination": destination
         }
     )
-    await message.answer(f"Отправьте тип машины")
+    await message.answer(f"Отправьте тип машины", reply_markup=car_type_menu)
     await Cargo.car_type.set()
 
 
@@ -51,7 +55,7 @@ async def find_car_type(message: types.Message, state: FSMContext):
             "car_type": car_type
         }
     )
-    await message.answer(f"Отправьте вес груза (от скольки тонн)")
+    await message.answer(f"Отправьте вес груза (от скольки тонн, допустимые значения от 0 до 22)")
     await Cargo.weight_from.set()
 
 
@@ -60,10 +64,10 @@ async def find_weight_from(message: types.Message, state: FSMContext):
     weight_from = message.text
     await state.update_data(
         {
-            "weight_from": weight_from
+            "weight_from": int(weight_from)
         }
     )
-    await message.answer(f"Отправьте вес груза (до скольки тонн)")
+    await message.answer(f"Отправьте вес груза (до скольки тонн, допустимые значения от 0 до 22)")
     await Cargo.weight_to.set()
 
 
@@ -72,10 +76,10 @@ async def find_weight_to(message: types.Message, state: FSMContext):
     weight_to = message.text
     await state.update_data(
         {
-            "weight_to": weight_to
+            "weight_to": int(weight_to)
         }
     )
-    await message.answer(f"Отправьте объем груза (от скольки м3)")
+    await message.answer(f"Отправьте объем груза (от скольки м3, допустимые значения от 0 до 130)")
     await Cargo.volume_from.set()
 
 
@@ -84,24 +88,29 @@ async def find_volume_from(message: types.Message, state: FSMContext):
     volume_from = message.text
     await state.update_data(
         {
-            "volume_from": volume_from
+            "volume_from": int(volume_from)
         }
     )
-    await message.answer(f"Отправьте объем груза (до скольки м3)")
+    await message.answer(f"Отправьте объем груза (до скольки м3, допустимые значения от 0 до 130)")
     await Cargo.volume_to.set()
 
 
 @dp.message_handler(state=Cargo.volume_to)
 async def find_volume_to(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    source = data.get("source")
-    destination = data.get("destination")
-    car_type = data.get("car_type")
-    weight_from = data.get("weight_from")
-    weight_to = data.get("weight_to")
-    volume_from = data.get("volume_from")
     volume_to = message.text
-
+    await state.update_data(
+        {
+            "volume_to": int(volume_to)
+        }
+    )
+    global SEARCH_PARAMETERS
+    SEARCH_PARAMETERS = await state.get_data()
+    source = SEARCH_PARAMETERS.get("source")
+    destination = SEARCH_PARAMETERS.get("destination")
+    car_type = SEARCH_PARAMETERS.get("car_type")
+    weight_from = SEARCH_PARAMETERS.get("weight_from")
+    weight_to = SEARCH_PARAMETERS.get("weight_to")
+    volume_from = SEARCH_PARAMETERS.get("volume_from")
     logging.info(f"Search model object is created")
 
     await message.answer(
@@ -116,10 +125,7 @@ async def find_volume_to(message: types.Message, state: FSMContext):
                 [
                     InlineKeyboardButton(
                         text=f"✔ Сохранить параметр поиска",
-                        callback_data=save_callback.new(model_type_to_save="search model", source=source,
-                                                        destination=destination,
-                                                        car_type=car_type, weight_from=weight_from, weight_to=weight_to,
-                                                        volume_from=volume_from, volume_to=volume_to)
+                        callback_data=save_callback.new(model_type_to_save="search model")
                     )
                 ]
             ]
@@ -131,14 +137,17 @@ async def find_volume_to(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(save_callback.filter(model_type_to_save="search model"))
 async def add_search_model(callback_query: types.CallbackQuery, callback_data: dict):
     logging.info(f"Adding search model to database")
-    await sql_commands.add_search_model(source=callback_data["source"], destination=callback_data["destination"],
-                                        car_type=callback_data["car_type"], weight_from=int(callback_data["weight_from"]),
-                                        weight_to=int(callback_data["weight_to"]), volume_from=int(callback_data["volume_from"]),
-                                        volume_to=int(callback_data["volume_to"]), telegram_id=callback_query.from_user.id)
+    await sql_commands.add_search_model(source=SEARCH_PARAMETERS.get("source"),
+                                        destination=SEARCH_PARAMETERS.get("destination"),
+                                        car_type=SEARCH_PARAMETERS.get("car_type"),
+                                        weight_from=SEARCH_PARAMETERS.get("weight_from"),
+                                        weight_to=SEARCH_PARAMETERS.get("weight_to"),
+                                        volume_from=SEARCH_PARAMETERS.get("volume_from"),
+                                        volume_to=SEARCH_PARAMETERS.get("volume_to"),
+                                        telegram_id=callback_query.from_user.id)
     await callback_query.answer(
-        text=f"Параметр был добавлен",
+        text=f"Параметр был добавлен, ожидайте уведомления по данному параметру",
         show_alert=True,
         cache_time=60
     )
     logging.info(f"Search model was successfully added to database")
-

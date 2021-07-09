@@ -26,8 +26,8 @@ async def bot_list(message: types.Message):
             f"Точка отправления: {search_model.source}\n"
             f"Пункт назначения: {search_model.destination}\n"
             f"Тип транспорта: {search_model.car_type}\n"
-            f"Объем от {search_model.volume_from} до {search_model.volume_to}\n"
-            f"Масса груза от {search_model.weight_from} до {search_model.weight_to}\n",
+            f"Объем от {search_model.volume_from} м3 до {search_model.volume_to} м3\n"
+            f"Масса груза от {search_model.weight_from} тонн до {search_model.weight_to} тонн\n",
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
